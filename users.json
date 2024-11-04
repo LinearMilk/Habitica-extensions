@@ -1,0 +1,7 @@
+[
+    {
+        "username": "descriptive name",
+        "user_id": "your Habitica user_id",
+        "api_token": "your Habitica api token"
+    }
+]
