@@ -96,7 +96,7 @@ def process_task(task, criteria):
     # Remove the prefix from the original notes (using the length of the original prefix)
     remaining_notes = notes[len(notes_prefix):].lstrip()
 
-    # Use a regular expression to extract the difficulty descriptor (case-insensitive, multiline)
+    # Use a regular expression to extract the difficulty descriptor (case-insensitive)
     match = re.match(r'(\w+)([\s\S]*)', remaining_notes, re.IGNORECASE)
     if match:
         difficulty_descriptor = match.group(1)
@@ -124,7 +124,6 @@ def process_task(task, criteria):
         'adjusted_notes': adjusted_notes
     }
 
-
 def create_todo_from_daily(processed_task, headers, logger):
     daily_task = processed_task['task']
     priority = processed_task['priority']
@@ -133,7 +132,7 @@ def create_todo_from_daily(processed_task, headers, logger):
     # Get the checklist from the Daily
     checklist = daily_task.get('checklist', [])
 
-    # Remove 'id' and 'completed' fields from checklist items
+    # Remove 'id' and reset 'completed' fields from checklist items
     # Since these will be new checklist items for the new To-Do
     new_checklist = []
     for item in checklist:
