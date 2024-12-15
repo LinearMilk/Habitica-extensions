@@ -1,6 +1,5 @@
 import requests
 import datetime
-import os
 import logging
 import json
 import re
@@ -26,6 +25,11 @@ def main():
         }
 
         try:
+            # Check if user logged in today
+            if not has_logged_in_today(headers, logger):
+                logger.info(f"Skipping {USERNAME}, user has not logged in today.")
+                continue
+
             tasks_to_convert = get_dailies_to_convert(headers, criteria, logger)
             for processed_task in tasks_to_convert:
                 create_todo_from_daily(processed_task, headers, logger)
@@ -59,6 +63,24 @@ def get_user_logger(username):
     logger.addHandler(fh)
 
     return logger
+
+def has_logged_in_today(headers, logger):
+    url = 'https://habitica.com/api/v3/user'
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        logger.error("Failed to fetch user data.")
+        return False
+
+    user_data = response.json().get('data', {})
+    last_login_timestamp = user_data.get('lastCron')
+    if not last_login_timestamp:
+        logger.warning("No lastCron timestamp found for user.")
+        return False
+
+    last_login_date = datetime.datetime.fromisoformat(last_login_timestamp).date()
+    today_date = datetime.datetime.utcnow().date()
+
+    return last_login_date == today_date
 
 def get_dailies_to_convert(headers, criteria, logger):
     url = 'https://habitica.com/api/v3/tasks/user?type=dailys'
