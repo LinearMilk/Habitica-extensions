@@ -101,6 +101,10 @@ def process_task(task, criteria):
     if not task['isDue']:
         return None
 
+    # Check if the task is already completed
+    if task.get('completed'):
+        return None
+
     # Get the notes field
     notes = task.get('notes', '')
 
