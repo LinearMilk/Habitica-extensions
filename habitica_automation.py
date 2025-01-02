@@ -72,13 +72,15 @@ def has_logged_in_today(headers, logger):
         return False
 
     user_data = response.json().get('data', {})
-    last_login_timestamp = user_data.get('lastCron')
-    if not last_login_timestamp:
-        logger.warning("No lastCron timestamp found for user.")
+    auth = user_data.get('auth', {})
+    timestamps = auth.get('timestamps', {})
+    updated_timestamp = timestamps.get('updated')
+    if not updated_timestamp:
+        logger.warning("No updated timestamp found in user data.")
         return False
 
-    last_login_date = datetime.datetime.fromisoformat(last_login_timestamp).date()
-    today_date = datetime.datetime.utcnow().date()
+    last_login_date = datetime.datetime.fromisoformat(updated_timestamp).date()
+    today_date = datetime.datetime.now(datetime.UTC).date()
 
     return last_login_date == today_date
 
